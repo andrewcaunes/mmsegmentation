@@ -1,6 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 # yapf: disable
-from .class_names import (ade_classes, ade_palette, bdd100k_classes,
+from .class_names import (apolloscape_classes, apolloscape_palette, ade_classes, ade_palette, bdd100k_classes,
                           bdd100k_palette, cityscapes_classes,
                           cityscapes_palette, cocostuff_classes,
                           cocostuff_palette, dataset_aliases, get_classes,
@@ -37,6 +37,7 @@ __all__ = [
     'TensorDict',
     'TensorList',
     'ForwardResults',
+    'apolloscape_classes',
     'cityscapes_classes',
     'ade_classes',
     'voc_classes',
@@ -46,6 +47,7 @@ __all__ = [
     'vaihingen_classes',
     'isaid_classes',
     'stare_classes',
+    'apolloscape_palette',
     'cityscapes_palette',
     'ade_palette',
     'voc_palette',

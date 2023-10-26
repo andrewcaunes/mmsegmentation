@@ -1,4 +1,4 @@
-_base_ = ['../_base_/default_runtime.py', '../_base_/datasets/cityscapes.py']
+_base_ = ['../_base_/default_runtime.py', '../_base_/datasets/apolloscape.py']
 
 crop_size = (512, 1024)
 data_preprocessor = dict(
@@ -142,12 +142,25 @@ train_pipeline = [
         scales=[int(1024 * x * 0.1) for x in range(5, 21)],
         resize_type='ResizeShortestEdge',
         max_size=4096),
-    dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
+    dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=1, min_offset_h=1000),
     dict(type='RandomFlip', prob=0.5),
     dict(type='PhotoMetricDistortion'),
+    dict(type='RGB2Gray'),
+
+    dict(type='PackSegInputs')
+]
+test_pipeline = [dict(type='LoadImageFromFile'),
+    dict(type='Resize', scale=(2048, 1024), keep_ratio=True),
+    # dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=1, min_offset_h=1000),
+    # dict(type='RandomFlip', prob=0.5),
+    # dict(type='PhotoMetricDistortion'),
+    dict(type='RGB2Gray'),
+
+    dict(type='LoadAnnotations'),
     dict(type='PackSegInputs')
 ]
 train_dataloader = dict(dataset=dict(pipeline=train_pipeline))
+val_dataloader = dict(dataset=dict(pipeline=test_pipeline))
 
 # optimizer
 embed_multi = dict(lr_mult=1.0, decay_mult=0.0)
@@ -194,4 +207,4 @@ default_hooks = dict(
 #   - `enable` means enable scaling LR automatically
 #       or not by default.
 #   - `base_batch_size` = (8 GPUs) x (2 samples per GPU).
-auto_scale_lr = dict(enable=False, base_batch_size=1)
+auto_scale_lr = dict(enable=True, base_batch_size=16)
