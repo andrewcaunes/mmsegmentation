@@ -232,7 +232,9 @@ class RandomCrop(BaseTransform):
     def __init__(self,
                  crop_size: Union[int, Tuple[int, int]],
                  cat_max_ratio: float = 1.,
-                 ignore_index: int = 255):
+                 ignore_index: int = 255,
+                 min_offset_h: Optional[int] = None,
+                 min_offset_w: Optional[int] = None):
         super().__init__()
         assert isinstance(crop_size, int) or (
             isinstance(crop_size, tuple) and len(crop_size) == 2
@@ -245,6 +247,8 @@ class RandomCrop(BaseTransform):
         self.crop_size = crop_size
         self.cat_max_ratio = cat_max_ratio
         self.ignore_index = ignore_index
+        self.min_offset_h = min_offset_h
+        self.min_offset_w = min_offset_w
 
     @cache_randomness
     def crop_bbox(self, results: dict) -> tuple:
@@ -269,8 +273,18 @@ class RandomCrop(BaseTransform):
 
             margin_h = max(img.shape[0] - self.crop_size[0], 0)
             margin_w = max(img.shape[1] - self.crop_size[1], 0)
-            offset_h = np.random.randint(0, margin_h + 1)
-            offset_w = np.random.randint(0, margin_w + 1)
+
+            min_offset_w = 0
+            min_offset_h = 0
+            if self.min_offset_h is not None:
+                assert self.min_offset_h >= 0
+                min_offset_h = min(self.min_offset_h, margin_h)
+            if self.min_offset_w is not None:
+                assert self.min_offset_w >= 0
+                min_offset_w = min(self.min_offset_w, margin_w)
+                
+            offset_h = np.random.randint(min_offset_h, margin_h + 1)
+            offset_w = np.random.randint(min_offset_w, margin_w + 1)
             crop_y1, crop_y2 = offset_h, offset_h + self.crop_size[0]
             crop_x1, crop_x2 = offset_w, offset_w + self.crop_size[1]
 
