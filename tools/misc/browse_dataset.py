@@ -64,8 +64,8 @@ def main():
             img,
             data_sample,
             show=not args.not_show,
-            wait_time=args.show_interval)
-
+            wait_time=args.show_interval,
+            draw_gt=False)
         progress_bar.update()
 
 
