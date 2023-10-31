@@ -64,88 +64,23 @@ def main():
     # init_default_scope('mmseg')
 
     dataset = DATASETS.build(cfg.train_dataloader.dataset)
-    # print dataset attributes
+    print(f'dataset: {dataset}')
     metainfo = dataset.METAINFO
-    # visualizer = VISUALIZERS.build(cfg.visualizer)
-    # print(f'visualizer: {visualizer}')
-    # print(f'visualizer cfg: {cfg.visualizer}')
-    # visualizer = SegLocalVisualizer(
-    #     vis_backends=[dict(type='LocalVisBackend')],
-    #     save_dir=save_dir,
-    #     alpha=opacity)
-    # visualizer.dataset_meta = dict(
-    #     classes=model.dataset_meta['classes'],
-    #     palette=model.dataset_meta['palette'])
-    # visualizer.add_datasample(
-    #     name=title,
-    #     image=image,
-    #     data_sample=result,
-    #     draw_gt=draw_gt,
-    #     draw_pred=draw_pred,
-    #     wait_time=wait_time,
-    #     out_file=out_file,
-    #     show=show,
-    #     withLabels=withLabels)
 
     progress_bar = ProgressBar(len(dataset))
     import numpy as np
     for item in dataset:
-        # print(f'item inputs: {item["inputs"].shape}')
-        # img = item['inputs'].permute(1, 2, 0).numpy()
-        # img = img[..., [2, 1, 0]]  # bgr to rgb
-        # print(f'img: {img.shape}')
+        img = item['inputs'].permute(1, 2, 0).numpy()
+        img = img[..., [2, 1, 0]] 
+         # bgr to rgb
         data_sample = item['data_samples'].numpy()
-        # print(f'data_sample: {data_sample}')
-        # print(f'data_sample: {data_sample}')
-        print(f'data_sample: {data_sample}')
-        print(f'data_sample: {data_sample.gt_sem_seg.cpu().data}')
-        # mask = np.array(data_sample.gt_sem_seg.cpu().data).transpose(1, 2, 0)
-        # # plot mask
-        # # import matplotlib.pyplot as plt
-        # # plt.imshow(mask)
-        # # plt.show()
-        # img_path = osp.basename(item['data_samples'].img_path)
-        # print(f'img_path: {img_path}')
-
-        # out_file = osp.join(
-        #     args.output_dir,
-        #     osp.basename(img_path)) if args.output_dir is not None else None
-
-        # visualizer.add_datasample(
-        #     name=osp.basename(img_path),
-        #     image=img,
-        #     data_sample=data_sample,
-        #     draw_gt=True,
-        #     draw_pred=False,
-        #     wait_time=args.show_interval,
-        #     out_file=out_file,
-        #     show=not args.not_show)
-        # model = init_model(args.config, device="cpu")
-        # if hasattr(model, 'module'):
-            # model = model.module
-        # print("model", model)
-        # if args.device == 'cpu':
-        #     model = revert_sync_batchnorm(model)
-        # test a single image
-        # result = inference_model(model, args.img)
-        # show the results
-
-        # Get dataset dependant classes and palette functions
-        # classes, palette = metainfo['classes'], metainfo['palette']
-        # model.dataset_meta = dict(
-        #     classes=classes,
-        #     palette=palette)
-        img = mmcv.imread(
-            item['data_samples'].img_path,
-            'color')
-        sem_seg = mmcv.imread(
-            item['data_samples'].seg_map_path,
-            'unchanged')
-        sem_seg = torch.from_numpy(sem_seg)
+        sem_seg = torch.from_numpy(data_sample.gt_sem_seg.cpu().data.transpose(1, 2, 0)).squeeze()
         gt_sem_seg_data = dict(data=sem_seg)
         gt_sem_seg = PixelData(**gt_sem_seg_data)
         data_sample = SegDataSample()
         data_sample.gt_sem_seg = gt_sem_seg
+        print(f'img: {img.shape}')
+        print(f'data_sample: {data_sample}')
 
         visualizer = SegLocalVisualizer(
         vis_backends=[dict(type='LocalVisBackend')],
@@ -156,7 +91,7 @@ def main():
         visualizer.add_datasample(name="test",
             image=img,
             data_sample=data_sample,
-            # draw_gt=draw_gt,
+            # draw_gt=False,
             # draw_pred=draw_pred,
             # wait_time=wait_time,
             out_file=args.output_dir,
