@@ -103,16 +103,17 @@ if __name__ == '__main__':
 
     elif gpu==2:
         import time
-        K = 64
+        K = 128
         with torch.no_grad():
             # Start timing palette tensor creation
             start_time_palette = time.time()
             palette_tensor = torch.tensor(palette, dtype=torch.uint8).cuda()
-            print(f"Time taken for palette tensor creation: {time.time() - start_time_palette} seconds")
+            # print(f"Time taken for palette tensor creation: {time.time() - start_time_palette} seconds")
 
             for root, dirs, files in os.walk(os.path.join(args.dataset, "labels")):
                 if len(files) > 0:
-                    for i in tqdm(range(0, len(files), K)):
+                    for i in range(0, len(files), K):
+                        print(f"{i}/{len(files)} ({i/len(files)*100:.2f}%) ({time.time() - start_time_palette:.2f}s)")
                         files_to_process = []
                         for j in range(K):
                             if i+j < len(files) and files[i+j].endswith(".png") and "/labels/" in root:
@@ -125,7 +126,7 @@ if __name__ == '__main__':
                         # Start timing empty tensor creation
                         start_time_empty_tensor = time.time()
                         imgs = torch.empty((K*dims[0], dims[1], 3), dtype=torch.uint8).cuda()
-                        print(f"Time taken for empty tensor creation: {time.time() - start_time_empty_tensor} seconds")
+                        # print(f"Time taken for empty tensor creation: {time.time() - start_time_empty_tensor} seconds")
 
                         # Start timing image reading and processing
                         start_time_img_read = time.time()
@@ -135,11 +136,11 @@ if __name__ == '__main__':
                                     img = torchvision.io.read_image(os.path.join(root, file), ImageReadMode.RGB).cuda()
                                 except:
                                     print(os.path.join(root, file))
-                                    raise
+                                    continue
                                 img.transpose_(2, 0)
                                 img.transpose_(0, 1)
                                 imgs[j*dims[0]:(j+1)*dims[0], :, :] = img
-                        print(f"Time taken for image reading and processing: {time.time() - start_time_img_read} seconds")
+                        # print(f"Time taken for image reading and processing: {time.time() - start_time_img_read} seconds")
 
                         # Start timing conversion to grayscale
                         start_time_gs_conversion = time.time()
@@ -150,7 +151,7 @@ if __name__ == '__main__':
                         gs_img_list = torch.split(gs_imgs.cpu(), dims[0], dim=0)
                         # gs_imgs = gs_imgs.reshape((K, dims[0], dims[1]))
                         # gs_img_list = [gs_imgs[i*dims[0]:(i+1)*dims[0], :] for i in range(len(files_to_process))]
-                        print(f"Time taken for grayscale conversion: {time.time() - start_time_gs_conversion} seconds")
+                        # print(f"Time taken for grayscale conversion: {time.time() - start_time_gs_conversion} seconds")
 
                         # # Start timing image writing
                         start_time_img_moving = time.time()
@@ -175,4 +176,4 @@ if __name__ == '__main__':
                         #     gs_img_path = os.path.join(args.dataset, "labels_gs", root.split("/")[-1], file)
                         #     os.makedirs(os.path.dirname(gs_img_path), exist_ok=True)
                         #     cv2.imwrite(gs_img_path, gs_imgs[i*dims[0]:(i+1)*dims[0], :].cpu().numpy())
-                        print(f"Time taken for image writing: {time.time() - start_time_img_write} seconds")
+                        # print(f"Time taken for image writing: {time.time() - start_time_img_write} seconds")
