@@ -1,5 +1,4 @@
 _base_ = ['../_base_/default_runtime.py', '../_base_/datasets/apolloscape.py']
-load_from = "/home/andrew/jean-zay/projects/mmsegmentation/work_dirs/m2f_AS/best_mIoU_iter_90000.pth"
 
 crop_size = (512, 1024)
 data_preprocessor = dict(
@@ -145,9 +144,12 @@ train_pipeline = [
         max_size=4096),
     dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=1, min_offset_h=1000),
     dict(type='RandomFlip', prob=0.5),
+    dict(type='BioMedicalGaussianNoise', prob=0.3, std=15, mean=10),
     dict(type='PhotoMetricDistortion'),
     dict(type='RGB2Gray'),
-
+    dict(type='RandomRotate', prob=0.7, degree=30, pad_val=(255,255,255)),
+    dict(type='RandomCutOut', prob=0.2, n_holes=2, cutout_shape=(1, 1), fill_in=(255.0, 255.0, 255.0)),
+    dict(type="BioMedicalGaussianBlur"),
     dict(type='PackSegInputs')
 ]
 test_pipeline = [dict(type='LoadImageFromFile'),
@@ -186,12 +188,12 @@ param_scheduler = [
         eta_min=0,
         power=0.9,
         begin=0,
-        end=90000,
+        end=160000,
         by_epoch=False)
 ]
 
 # training schedule for 90k
-train_cfg = dict(type='IterBasedTrainLoop', max_iters=90000, val_interval=5000)
+train_cfg = dict(type='IterBasedTrainLoop', max_iters=160000, val_interval=5000)
 val_cfg = dict(type='ValLoop')
 test_cfg = dict(type='TestLoop')
 default_hooks = dict(
