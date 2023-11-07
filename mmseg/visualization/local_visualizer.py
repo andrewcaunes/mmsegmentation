@@ -179,7 +179,7 @@ class SegLocalVisualizer(Visualizer):
                                    lineType)
         color_seg = (image * (1 - self.alpha) + mask * self.alpha).astype(
             np.uint8)
-        color_seg = image.astype(np.uint8)
+        # color_seg = image.astype(np.uint8)
         self.set_image(color_seg)
         return color_seg
 

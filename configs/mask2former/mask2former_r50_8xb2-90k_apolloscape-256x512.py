@@ -1,7 +1,8 @@
 _base_ = ['../_base_/default_runtime.py', '../_base_/datasets/apolloscape.py']
 load_from = "/home/andrew/jean-zay/projects/mmsegmentation/work_dirs/m2f_AS_2/best_mIoU_iter_90000.pth"
 
-crop_size = (512, 1024)
+num_classes = 38
+crop_size = (256, 512)
 data_preprocessor = dict(
     type='SegDataPreProcessor',
     mean=[123.675, 116.28, 103.53],
@@ -11,7 +12,6 @@ data_preprocessor = dict(
     seg_pad_val=255,
     size=crop_size,
     test_cfg=dict(size_divisor=32))
-num_classes = 38
 model = dict(
     type='EncoderDecoder',
     data_preprocessor=data_preprocessor,
@@ -142,7 +142,7 @@ train_pipeline = [
     dict(type='CenterCrop', crop_size=center_crop_size),
     dict(
         type='RandomChoiceResize',
-        scales=[int(1024 * x * 0.1) for x in range(5, 21)],
+        scales=[int(1024 * x * 0.1) for x in range(5, 8)],
         resize_type='ResizeShortestEdge',
         max_size=4096),
     dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=1, min_offset_h=1000),
@@ -151,7 +151,7 @@ train_pipeline = [
     dict(type='PhotoMetricDistortion'),
     dict(type='RGB2Gray'),
     dict(type='RandomRotate', prob=0.7, degree=50, pad_val=(255,255,255), seg_pad_val=0),
-    dict(type='RandomCutOut', prob=0.2, n_holes=(1,2), cutout_shape=[(2000, 100)], fill_in=(255.0, 255.0, 255.0), seg_fill_in=0),
+    dict(type='RandomCutOut', prob=0.2, n_holes=(1,2), cutout_ratio=[(1, 0.1)], fill_in=(255.0, 255.0, 255.0), seg_fill_in=0),
     dict(type="BioMedicalGaussianBlur", prob=0.7, different_sigma_per_channel=False, sigma_range=(0.1, 5.0)),
     dict(type='PackSegInputs')
 ]
