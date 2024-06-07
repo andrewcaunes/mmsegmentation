@@ -10,7 +10,7 @@ data_preprocessor = dict(
     seg_pad_val=255,
     size=crop_size,
     test_cfg=dict(size_divisor=32))
-num_classes = 38
+num_classes = 19
 model = dict(
     type='EncoderDecoder',
     data_preprocessor=data_preprocessor,

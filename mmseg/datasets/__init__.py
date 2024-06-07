@@ -5,6 +5,9 @@ from .basesegdataset import BaseCDDataset, BaseSegDataset
 from .bdd100k import BDD100KDataset
 from .chase_db1 import ChaseDB1Dataset
 from .cityscapes import CityscapesDataset
+from .cityscapes_static import CityscapesStaticDataset
+from .cityscapes_static_bg import CityscapesStaticBgDataset
+
 from .coco_stuff import COCOStuffDataset
 from .dark_zurich import DarkZurichDataset
 from .dataset_wrappers import MultiImageMixDataset
@@ -18,6 +21,13 @@ from .levir import LEVIRCDDataset
 from .lip import LIPDataset
 from .loveda import LoveDADataset
 from .mapillary import MapillaryDataset_v1, MapillaryDataset_v2
+from .mapillary_static_bg import MapillaryDataset_v1_static_bg
+from .mapillary_static_bg_nbs import MapillaryDataset_v1_static_bg_nbs
+from .mapillary_static_bg_ext import MapillaryDataset_v1_static_bg_ext
+from .mapillary_uda import MapillaryDataset_v1_uda
+# from .pc2D_nusc_ps1 import PC2DNuscPs1
+from .pc2D_nusc import PC2DNusc
+
 from .night_driving import NightDrivingDataset
 from .nyu import NYUDataset
 from .pascal_context import PascalContextDataset, PascalContextDataset59
@@ -58,8 +68,11 @@ __all__ = [
     'BioMedicalGaussianNoise', 'BioMedicalGaussianBlur',
     'BioMedicalRandomGamma', 'BioMedical3DPad', 'RandomRotFlip',
     'SynapseDataset', 'REFUGEDataset', 'MapillaryDataset_v1',
-    'MapillaryDataset_v2', 'Albu', 'LEVIRCDDataset',
+    'PC2DNusc',
+    'MapillaryDataset_v2', 'MapillaryDataset_v1_static_bg','MapillaryDataset_v1_static_bg_nbs',
+    'MapillaryDataset_v1_uda', 'MapillaryDataset_v1_static_bg_ext',
+     'MapillaryDataset_v1_static_bg_ext', 'Albu', 'LEVIRCDDataset',
     'LoadMultipleRSImageFromFile', 'LoadSingleRSImageFromFile',
     'ConcatCDInput', 'BaseCDDataset', 'DSDLSegDataset', 'BDD100KDataset',
-    'NYUDataset'
+    'NYUDataset', 'ApolloscapeDataset', 'CityscapesStaticDataset', 'CityscapesStaticBgDataset'
 ]

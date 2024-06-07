@@ -21,11 +21,11 @@ def parse_args():
     parser.add_argument(
         '--nproc', default=1, type=int, help='number of process')
     args = parser.parse_args()
-    return args
+    return args 
 
 
 def main():
-    args = parse_args()
+    args = parse_args() 
     cityscapes_path = args.cityscapes_path
     out_dir = args.out_dir if args.out_dir else cityscapes_path
     mkdir_or_exist(out_dir)

@@ -1,5 +1,5 @@
 _base_ = ['../_base_/default_runtime.py', '../_base_/datasets/apolloscape.py']
-# load_from = "/home/andrew/jean-zay/projects/mmsegmentation/work_dirs/m2f_AS_2/best_mIoU_iter_90000.pth"
+load_from = "/home/andrew/jean-zay/projects/mmsegmentation/work_dirs/m2f_r101_AS_320k/best_mIoU_iter_160000.pth"
 
 num_classes = 38
 crop_size = (256, 512)

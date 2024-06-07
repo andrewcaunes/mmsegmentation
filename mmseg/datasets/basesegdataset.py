@@ -116,11 +116,22 @@ class BaseSegDataset(BaseDataset):
         self.data_bytes: np.ndarray
 
         # Set meta information.
+        import logging
+        logging.basicConfig(format='[%(module)s | l.%(lineno)d] %(message)s')
+        logging.getLogger().setLevel(logging.INFO)
+        logging.info('metainfo=\n%s',metainfo)
         self._metainfo = self._load_metainfo(copy.deepcopy(metainfo))
+        logging.info('self._metainfo=\n%s',self._metainfo)
 
         # Get label map for custom classes
         new_classes = self._metainfo.get('classes', None)
-        self.label_map = self.get_label_map(new_classes)
+        label_map = self.metainfo.get('label_map', None)
+        if label_map is not None:
+            self.label_map = label_map# new_classes = list(np.unique([self.metainfo['classes'][v] for v in label_map.values()]))
+        else:
+            self.label_map = self.get_label_map(new_classes)
+        logging.info('new_classes=\n%s',new_classes)
+        logging.info('self.label_map=\n%s',self.label_map)
         self._metainfo.update(
             dict(
                 label_map=self.label_map,
@@ -128,8 +139,8 @@ class BaseSegDataset(BaseDataset):
 
         # Update palette based on label map or generate palette
         # if it is not defined
-        updated_palette = self._update_palette()
-        self._metainfo.update(dict(palette=updated_palette))
+        # updated_palette = self._update_palette()
+        # self._metainfo.update(dict(palette=updated_palette))
 
         # Join paths.
         if self.data_root is not None:
@@ -167,6 +178,10 @@ class BaseSegDataset(BaseDataset):
                 new classes in self._metainfo
         """
         old_classes = cls.METAINFO.get('classes', None)
+        import logging
+        logging.basicConfig(format='[%(module)s | l.%(lineno)d] %(message)s')
+        logging.getLogger().setLevel(logging.INFO)
+        logging.info('old_classes=\n%s',old_classes)
         if (new_classes is not None and old_classes is not None
                 and list(new_classes) != list(old_classes)):
 
