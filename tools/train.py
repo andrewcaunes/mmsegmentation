@@ -25,6 +25,7 @@ def parse_args():
         action='store_true',
         default=False,
         help='enable automatic-mixed-precision training')
+    
     parser.add_argument(
         '--cfg-options',
         nargs='+',

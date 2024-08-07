@@ -118,3 +118,10 @@ mmseg/.mim
 
 # Pytorch
 *.pth
+=2.0.0rc4
+.gitignore
+=
+=3.0.0
+=7.0.0
+test.ipynb
+val_rdps5/

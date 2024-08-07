@@ -31,7 +31,7 @@ class MapillaryDataset_v1_uda(BaseSegDataset):
                   'sidewalk', 
                   'terrain', 
                   'vegetation', 
-                  'manmade',  # in T-UDA only
+                  'manmade'  # in T-UDA only
                  ),#, 'person', 'rider', 'car', 'truck', 'bus', 'train',
                  #'motorcycle', 'bicycle'),
         palette=[[  0,   0,   0],  # color,  is_instance_class

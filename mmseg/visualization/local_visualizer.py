@@ -179,7 +179,9 @@ class SegLocalVisualizer(Visualizer):
                                    lineType)
         color_seg = (image * (1 - self.alpha) + mask * self.alpha).astype(
             np.uint8)
+        # remove segs on image for visualizing augmentation
         # color_seg = image.astype(np.uint8)
+
         self.set_image(color_seg)
         return color_seg
 
@@ -296,7 +298,6 @@ class SegLocalVisualizer(Visualizer):
             withLabels(bool, optional): Add semantic labels in visualization
                 result, Defaults to True.
         """
-        print("Adding datasample")
         classes = self.dataset_meta.get('classes', None)
         palette = self.dataset_meta.get('palette', None)
 
@@ -304,7 +305,6 @@ class SegLocalVisualizer(Visualizer):
         pred_img_data = None
 
         if draw_gt and data_sample is not None:
-            print("Drawing pred_sem_seg")
             if 'gt_sem_seg' in data_sample:
                 assert classes is not None, 'class information is ' \
                                             'not provided when ' \
@@ -320,7 +320,6 @@ class SegLocalVisualizer(Visualizer):
 
         if draw_pred and data_sample is not None:
 
-            print("Drawing pred_sem_seg")
             if 'pred_sem_seg' in data_sample:
 
                 assert classes is not None, 'class information is ' \

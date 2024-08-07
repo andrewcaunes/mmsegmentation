@@ -1,5 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import argparse
+import copy
 import os
 import os.path as osp
 
@@ -81,42 +82,100 @@ def trigger_visualization_hook(cfg, args):
 
 def main():
     args = parse_args()
+    args_ref = copy.deepcopy(args)
 
-    # load config
-    cfg = Config.fromfile(args.config)
-    cfg.launcher = args.launcher
-    if args.cfg_options is not None:
-        cfg.merge_from_dict(args.cfg_options)
 
-    # work_dir is determined in this priority: CLI > segment in file > filename
-    if args.work_dir is not None:
-        # update configs according to CLI args if args.work_dir is not None
-        cfg.work_dir = args.work_dir
-    elif cfg.get('work_dir', None) is None:
-        # use config filename as default work_dir if cfg.work_dir is None
-        cfg.work_dir = osp.join('./work_dirs',
-                                osp.splitext(osp.basename(args.config))[0])
+    if not os.path.isdir(args.checkpoint):
+        # load config
+        cfg = Config.fromfile(args.config)
+        cfg.launcher = args.launcher
+        if args.cfg_options is not None:
+            cfg.merge_from_dict(args.cfg_options)
 
-    cfg.load_from = args.checkpoint
+        # work_dir is determined in this priority: CLI > segment in file > filename
+        if args.work_dir is not None:
+            # update configs according to CLI args if args.work_dir is not None
+            cfg.work_dir = args.work_dir
+        elif cfg.get('work_dir', None) is None:
+            # use config filename as default work_dir if cfg.work_dir is None
+            cfg.work_dir = osp.join('./work_dirs',
+                                    osp.splitext(osp.basename(args.config))[0])
+        cfg.load_from = args.checkpoint
+        if args.show or args.show_dir:
+            cfg = trigger_visualization_hook(cfg, args)
+        if args.tta:
+            cfg.test_dataloader.dataset.pipeline = cfg.tta_pipeline
+            cfg.tta_model.module = cfg.model
+            cfg.model = cfg.tta_model
 
-    if args.show or args.show_dir:
-        cfg = trigger_visualization_hook(cfg, args)
+        # add output_dir in metric
+        if args.out is not None:
+            cfg.test_evaluator['output_dir'] = args.out
+            cfg.test_evaluator['keep_results'] = True
+        # build the runner from config
+        runner = Runner.from_cfg(cfg)
+        # start testing
+        runner.test()
+    else:
+        ckpt_list = [file for file in os.listdir(args.checkpoint) if file.endswith('.pth')]
+        print(f'Found {len(ckpt_list)} checkpoints in {args.checkpoint} :')
+        print(ckpt_list)
+        for ckpt in ckpt_list:
+            ckpt_file = osp.join(args.checkpoint, ckpt)
+            ckpt_name = osp.splitext(ckpt)[0]
+            results_folder = osp.join(args.checkpoint, "test_results", ckpt_name)
 
-    if args.tta:
-        cfg.test_dataloader.dataset.pipeline = cfg.tta_pipeline
-        cfg.tta_model.module = cfg.model
-        cfg.model = cfg.tta_model
+            # load config
+            args = copy.deepcopy(args_ref)
+            cfg = Config.fromfile(args.config)
+            cfg.launcher = args.launcher
+            if args.cfg_options is not None:
+                cfg.merge_from_dict(args.cfg_options)
 
-    # add output_dir in metric
-    if args.out is not None:
-        cfg.test_evaluator['output_dir'] = args.out
-        cfg.test_evaluator['keep_results'] = True
+            # work_dir is determined in this priority: CLI > segment in file > filename
+            if args.work_dir is not None:
+                # update configs according to CLI args if args.work_dir is not None
+                cfg.work_dir = args.work_dir
+            # elif cfg.get('work_dir', None) is None:
+            #     # use config filename as default work_dir if cfg.work_dir is None
+            #     cfg.work_dir = osp.join('./work_dirs',
+            #                             osp.splitext(osp.basename(args.config))[0])
+            # if args.show_dir:
+            else:
+                cfg.work_dir = results_folder
+            
 
-    # build the runner from config
-    runner = Runner.from_cfg(cfg)
+            if osp.exists(results_folder):
+                json_files = []
+                for root, dirs, files in os.walk(results_folder):
+                    for file in files:
+                        if file.endswith('.json'):
+                            json_files.append(file)
+                # print(osp.join(args.show_dir, ckpt_name))
+                if len(json_files) > 0:
+                    print(f'Checkpoint {ckpt_name} already evaluated in {json_files}, skipping...')
+                    continue
+            else:  
+                os.makedirs(results_folder, exist_ok=True)
+                    
 
-    # start testing
-    runner.test()
+            print(f'Evaluating {ckpt_file}')
+            
+            cfg.load_from = ckpt_file
+
+            args.show_dir = results_folder
+            cfg = trigger_visualization_hook(cfg, args)
+
+            if args.tta:
+                cfg.test_dataloader.dataset.pipeline = cfg.tta_pipeline
+                cfg.tta_model.module = cfg.model
+                cfg.model = cfg.tta_model
+
+
+            # build the runner from config
+            runner = Runner.from_cfg(cfg)
+            # start testing
+            runner.test()
 
 
 if __name__ == '__main__':

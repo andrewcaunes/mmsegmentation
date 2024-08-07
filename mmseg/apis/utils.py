@@ -10,7 +10,6 @@ ImageType = Union[str, np.ndarray, Sequence[str], Sequence[np.ndarray]]
 
 
 def _preprare_data(imgs: ImageType, model: BaseModel):
-
     cfg = model.cfg
     for t in cfg.test_pipeline:
         if t.get('type') == 'LoadAnnotations':

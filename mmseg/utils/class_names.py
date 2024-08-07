@@ -176,6 +176,9 @@ def mapillary_v1_classes():
         'Caravan', 'Motorcycle', 'On Rails', 'Other Vehicle', 'Trailer',
         'Truck', 'Wheeled Slow', 'Car Mount', 'Ego Vehicle', 'Unlabeled'
     ]
+# pc2D_nusc_ps1_aliases ={
+#        'road': ['sidewalk'],
+#    }
 
 
 def mapillary_v1_palette():
